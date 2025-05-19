@@ -1,6 +1,7 @@
 package com.example.tp2.ui.screens
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,64 +17,74 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tp2.data.GameDatabaseHelper
 import com.example.tp2.data.User
+import com.example.tp2.ui.theme.Background
+import com.example.tp2.ui.theme.ErrorRed
+import com.example.tp2.ui.theme.Primary
+import com.example.tp2.ui.theme.Secondary
+import com.example.tp2.ui.theme.TextPrimary
+import com.example.tp2.ui.theme.TextSecondary
 import com.example.tp2.ui.theme.TP2Theme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen( context: Context, onStartGame: (User) -> Unit) {
 
-    var username by remember { mutableStateOf("")}
+    var username by remember { mutableStateOf("") }
     var dbHelper = remember { GameDatabaseHelper(context) }
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Background)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "¡Bienvenido!",
-            style = MaterialTheme.typography.headlineLarge.copy(
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+
+            Text(
+                text = "¡Bienvenido!",
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                ),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
             )
-        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        Text(
-            text = "Ingresa tu nombre de usuario para comenzar:",
-            fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-        )
+            Text(
+                text = "Ingrese su nombre de usuario",
+                fontSize = 18.sp,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                color = TextSecondary
+            )
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(44.dp))
 
-        OutlinedTextField(
-            value = username,
-            onValueChange = { username = it},
-            label = { Text("Nombre de usuario") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
+            OutlinedTextField(
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("Nombre de usuario", color = TextSecondary) },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+            )
 
-        Spacer( modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(64.dp))
 
-        Button( onClick = {
-            val user = dbHelper.getUser(username)
-            user?.let { onStartGame(it) }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-        ){
-            Text("Comenzar")
+        Button(
+            onClick = {
+                val user = dbHelper.getUser(username)
+                user?.let { onStartGame(it) }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Primary,
+            )
+        ) {
+            Text("Comenzar", color = Background, fontSize = 20.sp)
         }
     }
 }

@@ -1,24 +1,17 @@
 package com.example.tp2.ui.theme
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
-    primary = BluePrimary,
-    secondary = BlueDark,
-    tertiary = BlueLight
-)
-
 private val LightColorScheme = lightColorScheme(
-    primary = BluePrimary,
+    primary = Primary,
     onPrimary = Color.White,
-    secondary = BlueDark,
+    secondary = Secondary,
     onSecondary = Color.White,
-    background = BackgroundLight,
-    onBackground = TextPrimary,
+    background = Background,
+    onBackground = Color.Black,
     surface = Color.White,
     onSurface = TextPrimary,
     error = ErrorRed,

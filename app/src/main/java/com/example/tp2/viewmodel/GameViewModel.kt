@@ -25,7 +25,7 @@ class GameViewModel(private val dbHelper: GameDatabaseHelper): ViewModel(){
         if (guess == null || guess !in 1..5){
             uiState = uiState.copy(
                 mostrarMensaje = true,
-                mensaje = "El numero debe estar entre 1 y 5."
+                mensaje = "El numero debe estar entre 1 y 5"
             )
             return
         }
@@ -72,6 +72,7 @@ class GameViewModel(private val dbHelper: GameDatabaseHelper): ViewModel(){
                 puntajeActual = if (perdio) 0 else uiState.puntajeActual,
                 numeroIngresado = "",
                 perdio = perdio,
+                numeroAleatorio = (1..5).random(),
                 mostrarMensaje = true,
                 mensaje = if (perdio)
                     "Ha fallado 5 veces. ¡Juegue otra vez!"
@@ -108,8 +109,15 @@ class GameViewModel(private val dbHelper: GameDatabaseHelper): ViewModel(){
         viewModelScope.launch {
             var userbd = dbHelper.getUser(user.nombre)
             if (userbd == null) {
-                dbHelper.addUser(user.nombre)
-                userbd = dbHelper.getUser(user.nombre)
+                val exito = dbHelper.addUser(user.nombre)
+                if (!exito){
+                    uiState = uiState.copy(
+                        mensaje = "Error al crear el usuario.",
+                        mostrarMensaje = true
+                        )
+                }else{
+                    userbd = dbHelper.getUser(user.nombre)
+                }
             }
             userbd
             uiState = uiState.copy(user = user, mayorPuntaje = user.mayorPuntaje)

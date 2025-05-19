@@ -35,16 +35,22 @@ class GameDatabaseHelper(context: Context) :
             onCreate(db)
         }
 
-    fun addUser(nombre: String){
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_NOMBRE, nombre)
-            put(COLUMN_PUNTAJE_ACTUAL,0)
-            put(COLUMN_PUNTAJE_MAYOR,0)
-            put(COLUMN_FALLOS,0)
+    fun addUser(nombre: String): Boolean{
+        if (nombre.isBlank()) return false
+        return try{
+            val db = writableDatabase
+            val values = ContentValues().apply {
+                put(COLUMN_NOMBRE, nombre)
+                put(COLUMN_PUNTAJE_ACTUAL,0)
+                put(COLUMN_PUNTAJE_MAYOR,0)
+                put(COLUMN_FALLOS,0)
         }
         db.insertWithOnConflict(TABLE_USERS, null, values, SQLiteDatabase.CONFLICT_IGNORE)
-    }
+        true
+        } catch(e: Exception) {
+            false
+        }
+}
 
     fun getUser(name: String): User? {
         val db = readableDatabase
