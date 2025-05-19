@@ -1,7 +1,8 @@
 package com.example.tp2.data
 
 data class User(
-    val nombre: String,
+    var nombre: String,
     var puntajeActual: Int,
-    var mayorPuntaje: Int
+    var mayorPuntaje: Int,
+    var fallos: Int
 )

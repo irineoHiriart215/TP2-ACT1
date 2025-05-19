@@ -4,19 +4,18 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import androidx.collection.arraySetOf
-import androidx.core.content.contentValuesOf
 
 class GameDatabaseHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
         companion object {
             private const val DATABASE_NAME = "game.db"
-            private const val DATABASE_VERSION = 1
+            private const val DATABASE_VERSION = 2
 
             private const val TABLE_USERS = "users"
             private const val COLUMN_NOMBRE = "nombre"
             private const val COLUMN_PUNTAJE_ACTUAL ="puntaje_actual"
             private const val COLUMN_PUNTAJE_MAYOR = "mayor_puntaje"
+            private const val  COLUMN_FALLOS = "fallos"
         }
 
         override fun onCreate(db: SQLiteDatabase){
@@ -24,7 +23,8 @@ class GameDatabaseHelper(context: Context) :
                 CREATE TABLE $TABLE_USERS (
                 $COLUMN_NOMBRE TEXT PRIMARY KEY,
                 $COLUMN_PUNTAJE_ACTUAL INTEGER,
-                $COLUMN_PUNTAJE_MAYOR INTEGER
+                $COLUMN_PUNTAJE_MAYOR INTEGER,
+                $COLUMN_FALLOS INTEGER
                 )
             """.trimIndent()
             db.execSQL(createTable)
@@ -35,12 +35,13 @@ class GameDatabaseHelper(context: Context) :
             onCreate(db)
         }
 
-    fun addUser(name: String){
+    fun addUser(nombre: String){
         val db = writableDatabase
         val values = ContentValues().apply {
-            put(COLUMN_NOMBRE, name)
+            put(COLUMN_NOMBRE, nombre)
             put(COLUMN_PUNTAJE_ACTUAL,0)
             put(COLUMN_PUNTAJE_MAYOR,0)
+            put(COLUMN_FALLOS,0)
         }
         db.insertWithOnConflict(TABLE_USERS, null, values, SQLiteDatabase.CONFLICT_IGNORE)
     }
@@ -49,7 +50,7 @@ class GameDatabaseHelper(context: Context) :
         val db = readableDatabase
         val cursor = db.query(
             TABLE_USERS,
-            arrayOf(COLUMN_NOMBRE,COLUMN_PUNTAJE_ACTUAL,COLUMN_PUNTAJE_MAYOR),
+            arrayOf(COLUMN_NOMBRE,COLUMN_PUNTAJE_ACTUAL,COLUMN_PUNTAJE_MAYOR, COLUMN_FALLOS),
             "$COLUMN_NOMBRE = ?",
             arrayOf(name),
             null,null,null
@@ -58,7 +59,8 @@ class GameDatabaseHelper(context: Context) :
             val user = User(
                 nombre = cursor.getString(0),
                 puntajeActual = cursor.getInt(1),
-                mayorPuntaje = cursor.getInt(2)
+                mayorPuntaje = cursor.getInt(2),
+                fallos = cursor.getInt(3)
             )
             cursor.close()
             user
@@ -77,30 +79,11 @@ class GameDatabaseHelper(context: Context) :
         db.update(TABLE_USERS, values, "$COLUMN_NOMBRE = ?", arrayOf(name))
     }
 
-    fun getMejorUser (): User? {
-        val db = readableDatabase
-        val cursor = db.query(
-            TABLE_USERS,
-            arrayOf(COLUMN_NOMBRE, COLUMN_PUNTAJE_ACTUAL, COLUMN_PUNTAJE_MAYOR),
-            null,
-            null,
-            null,
-            null,
-            "COLUMN_PUNTAJE_MAYOR DESC",
-            "1"
-        )
-        return if (cursor.moveToFirst()){
-            val user = User(
-                nombre =cursor.getString(0),
-                puntajeActual = cursor.getInt(1),
-                mayorPuntaje = cursor.getInt(2)
-            )
-            cursor.close()
-            user
-        } else {
-            cursor.close()
-            null
+    fun updateFallos(name: String, fallos: Int){
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_FALLOS, fallos)
         }
+        db.update(TABLE_USERS, values, "$COLUMN_NOMBRE = ?", arrayOf(name))
     }
-
-    }
+}
